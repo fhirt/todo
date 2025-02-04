@@ -10,6 +10,7 @@ type Item struct {
 	Text     string
 	Priority int
 	position int
+	Done     bool
 }
 
 func (i *Item) Label() string {
@@ -25,6 +26,13 @@ func (i *Item) SetPriority(p int) {
 	default:
 		i.Priority = 2
 	}
+}
+
+func (i *Item) PrettyDone() string {
+	if i.Done {
+		return "X"
+	}
+	return ""
 }
 
 func (i *Item) PrettyP() string {
@@ -67,11 +75,14 @@ func ReadItems(filename string) ([]Item, error) {
 
 type ByPriority []Item
 
-func (a ByPriority) Len() int      { return len(a) }
-func (a ByPriority) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-func (a ByPriority) Less(i, j int) bool {
-	if a[i].Priority == a[j].Priority {
-		return a[i].position < a[j].position
+func (s ByPriority) Len() int      { return len(s) }
+func (s ByPriority) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+func (s ByPriority) Less(i, j int) bool {
+	if s[i].Done != s[j].Done {
+		return s[j].Done
 	}
-	return a[i].Priority < a[j].Priority
+	if s[i].Priority == s[j].Priority {
+		return s[i].position < s[j].position
+	}
+	return s[i].Priority < s[j].Priority
 }
